@@ -16,6 +16,9 @@ import javax.swing.*;
 public class Dao {
      private static Connection con;
     private static PreparedStatement ps;
+
+    public Dao() {
+    }
     
     public static Connection CreateConnection() throws SQLException{
         
@@ -24,26 +27,16 @@ public class Dao {
         String password = "admin";
         
         con = DriverManager.getConnection(url,username,password);
-        createTables();
+
+        
         return con;
     }
 
-    public static void createTables() throws SQLException{
-        
-        String sql = "CREATE TABLE CarVoting (Car VARCHAR(20) , Vote INT )";
-        
-        ps = con.prepareStatement(sql);
-        ps.executeUpdate();
-        JOptionPane.showMessageDialog(null,"Table created ");
-        
-        
-    }
-    
-    
-    public void insertData() throws SQLException{
+ 
+    public static void insertData() throws SQLException{
         
        String sql = "INSERT INTO CarVoting(Car , Vote ) Values('BMW',0) ,('Ford' , 0),('Toyota' , 0),('VW',0)";
-       
+      
        
        ps = con.prepareStatement(sql);
        ps.executeUpdate();
@@ -51,36 +44,26 @@ public class Dao {
     
     public int updateVotes(String carName, int newValue) throws SQLException{
         
-        String sql = "UPDATE CarVoting Vote = ? WHERE Car = ? ";
+        String sql = "UPDATE CarVoting SET  Vote = vote + 1 WHERE Car = ? ";
         
         ps = con.prepareStatement(sql);
         ps.setInt(1, newValue);
         ps.setString(2,carName);
        int changes =   ps.executeUpdate();
        
-        if ( changes > 0) {
-       
-        String selectSql = "SELECT Vote FROM CarVoting WHERE Car = ?";
-        
-        ps = con.prepareStatement(selectSql);
-        ps.setString(1, carName); 
-        
-        ResultSet rs = ps.executeQuery(); 
-        
-        if (rs.next()) {
-           
-            return rs.getInt("Vote");
-        }
+        if ( changes < 1) {
+         return 0;
+
       
     }
-    return -1;
+    return 1;
       
     }
     
-    public ArrayList Cars() throws SQLException{
+    public ArrayList getCarVotes() throws SQLException{
         
-        String sql = "Select * from Car ";
-        ArrayList<WorkerClass> list = new ArrayList<>();
+        String sql = "Select * from carvoting ";
+        ArrayList<VotingPole> list = new ArrayList<>();
         ps = con.prepareStatement(sql);
         
         ResultSet rs = ps.executeQuery();
@@ -88,8 +71,9 @@ public class Dao {
         while(rs.next()){
             
             
-         WorkerClass obj1 = new  WorkerClass(rs.getString("Car"),rs.getInt("Vote"));
+         VotingPole obj1 = new  VotingPole(rs.getString("Car"),rs.getInt("Vote"));
          list.add(obj1);
+            System.out.println(obj1);
         }
        return list;
     }

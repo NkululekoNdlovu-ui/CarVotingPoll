@@ -10,7 +10,9 @@ import java.net.*;
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.sql.*;
-import static za.ac.cput.carvoting.Dao.CreateConnection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  *
@@ -19,6 +21,7 @@ import static za.ac.cput.carvoting.Dao.CreateConnection;
 public class ServerAppGUI extends JFrame implements ActionListener {
     
     private ServerSocket server ;
+    Socket socket ;
     private Socket listenForConn;
     private ObjectOutputStream out;
     private ObjectInputStream in;
@@ -26,23 +29,37 @@ public class ServerAppGUI extends JFrame implements ActionListener {
     private JPanel topPanel = new JPanel();
     private JPanel centerPanel = new JPanel();
     private String userActivity;
+    private Dao db;
     
     public ServerAppGUI(){
         try{
-            server = new ServerSocket(6666,1);
-           
-           topPanel.add(serverTxtArea);
+            topPanel.add(serverTxtArea);
            this.add(topPanel);
+           
+            server = new ServerSocket(6666,1);
+            db = new Dao();
+            listen();
+            
+            
+          
            
         }catch(IOException  ioe){
             ioe.printStackTrace();
+        } catch (SQLException ex) {
+            Logger.getLogger(ServerAppGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    public void listen(){
+    public void listen() throws SQLException{
         try{
+            System.out.println("Server ;isterning");
             listenForConn = server.accept();
-//             Dao.CreateConnection();
+        
+            System.out.println("Connted");
+            Dao.CreateConnection();
+            
+            getStreams();
+            communication();
         }catch(IOException ioe){
             ioe.printStackTrace();
         }
@@ -56,16 +73,28 @@ public class ServerAppGUI extends JFrame implements ActionListener {
     
     public void sendData( ){}
     
-    public void communication(){
+    public void communication() {
         try{
-            getStreams();
-            
-            userActivity = (String)in.readObject();
-            serverTxtArea.append("Client>>> "+ userActivity);
+            while(true){
+                Object recievedObject = in.readObject();
+                
+                if(recievedObject instanceof String){
+                  recievedObject = (String) recievedObject;
+                  
+                    if(recievedObject.equals("getAll")){
+                        System.out.println(db.getCarVotes());
+                        out.writeObject(db.getCarVotes());
+                        out.flush();
+                    }
+                }     
+                
+            }
             
  
         }catch(IOException | ClassNotFoundException ioe){
         
+        } catch (SQLException ex) {
+            Logger.getLogger(ServerAppGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -76,14 +105,16 @@ public class ServerAppGUI extends JFrame implements ActionListener {
     }
     
     public static void main(String[] args) {
-        System.out.println("Hello World!");
-        ServerAppGUI runServerGui = new ServerAppGUI();
-        
-        runServerGui.pack();
-        runServerGui.setSize(500, 500);
-        runServerGui.setVisible(true);
-        runServerGui.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        runServerGui.listen();
+       
+            System.out.println("Hello World!");
+            ServerAppGUI runServerGui = new ServerAppGUI();
+            
+            runServerGui.pack();
+            runServerGui.setSize(500, 500);
+            runServerGui.setVisible(true);
+            runServerGui.setDefaultCloseOperation(EXIT_ON_CLOSE);
+           
+       
     }
 
     @Override

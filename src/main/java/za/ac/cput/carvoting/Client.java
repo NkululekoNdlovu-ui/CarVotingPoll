@@ -19,11 +19,7 @@ public class Client {
     private String response;
     
     public Client(){
-        try{
-            serverConn = new Socket("127.0.0.1", 6666);
-        }catch(IOException ioe){
-            ioe.printStackTrace();
-        }
+       
     }
     
     
@@ -34,7 +30,11 @@ public class Client {
     }
     
     public void communicateWihServer(){
-    
+         try{
+            serverConn = new Socket("127.0.0.1", 6666);
+        }catch(IOException ioe){
+            ioe.printStackTrace();
+        }
     }
     
     public void closeStreamAndConnection() throws IOException{

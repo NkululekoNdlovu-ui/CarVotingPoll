@@ -16,14 +16,8 @@ public class CarVoting {
     public static void main(String[] args) throws SQLException {
        ClientAppGUI runClient = new ClientAppGUI();
        
-       runClient.pack();
-       runClient.setSize(500,500);
        runClient.setGui();
-       runClient.setVisible(true);
-       runClient.setDefaultCloseOperation(EXIT_ON_CLOSE);
-       
-       Client clientCon = new Client();
-       clientCon.communicateWihServer();
+       System.out.println("dpmr with vonnection");
        
     }
 }

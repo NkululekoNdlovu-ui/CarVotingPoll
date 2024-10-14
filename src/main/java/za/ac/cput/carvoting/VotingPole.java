@@ -4,19 +4,21 @@
  */
 package za.ac.cput.carvoting;
 
+import java.io.Serializable;
+
 /**
  *
  * @author DELL
  */
-public class WorkerClass {
+public class VotingPole implements Serializable{
     
     private String carName;
     private int numberOfVotes;
 
-    public WorkerClass() {
+    public VotingPole() {
     }
 
-    public WorkerClass(String carName, int numberOfVotes) {
+    public VotingPole(String carName, int numberOfVotes) {
         this.carName = carName;
         this.numberOfVotes = numberOfVotes;
     }
